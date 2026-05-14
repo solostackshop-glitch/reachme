@@ -1,4 +1,4 @@
-import { Redis } from '@upstash/redis';
+import { kv } from '@vercel/kv';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,12 +16,7 @@ export async function GET(request) {
   }
 
   try {
-    const redis = new Redis({
-      url: process.env.KV_REST_API_URL,
-      token: process.env.KV_REST_API_TOKEN,
-    });
-
-    await redis.set('connectivity', { status, updatedAt: new Date().toISOString() });
+    await kv.set('connectivity', { status, updatedAt: new Date().toISOString() });
     return Response.json({ ok: true, status });
   } catch (e) {
     return Response.json({ error: e.message }, { status: 500 });

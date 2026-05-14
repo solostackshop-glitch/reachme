@@ -1,17 +1,12 @@
-import { Redis } from '@upstash/redis';
+import { kv } from '@vercel/kv';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const redis = new Redis({
-      url: process.env.KV_REST_API_URL,
-      token: process.env.KV_REST_API_TOKEN,
-    });
-
-    const data = await redis.get('connectivity');
+    const data = await kv.get('connectivity');
     return Response.json(data || { status: 'unknown', updatedAt: null }, {
-      headers: { 'Cache-Control': 'no-store' },
+      headers: { 'Cache-Control': 'no-store, max-age=0' },
     });
   } catch (e) {
     return Response.json({ status: 'unknown', updatedAt: null, error: e.message });
