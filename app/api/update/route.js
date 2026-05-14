@@ -3,8 +3,13 @@ export const runtime = 'edge';
 async function kvSet(key, value) {
   const url = process.env.KV_REST_API_URL;
   const token = process.env.KV_REST_API_TOKEN;
-  const res = await fetch(`${url}/set/${key}/${encodeURIComponent(JSON.stringify(value))}`, {
-    headers: { Authorization: `Bearer ${token}` },
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(['SET', key, JSON.stringify(value)]),
   });
   return res.json();
 }
@@ -22,10 +27,10 @@ export async function GET(request) {
     return Response.json({ error: 'Invalid status. Use wifi or data.' }, { status: 400 });
   }
 
-  await kvSet('connectivity', {
+  const result = await kvSet('connectivity', {
     status,
     updatedAt: new Date().toISOString(),
   });
 
-  return Response.json({ ok: true, status });
+  return Response.json({ ok: true, status, debug: result });
 }
