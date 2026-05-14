@@ -1,3 +1,5 @@
+import { Redis } from '@upstash/redis';
+
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const status = searchParams.get('status');
@@ -11,26 +13,14 @@ export async function GET(request) {
     return Response.json({ error: 'Invalid status. Use wifi or data.' }, { status: 400 });
   }
 
-  const url = process.env.KV_REST_API_URL;
-  const token = process.env.KV_REST_API_TOKEN;
-
-  if (!url || !token) {
-    return Response.json({ error: 'Missing env vars', url: !!url, token: !!token }, { status: 500 });
-  }
-
-  const value = JSON.stringify({ status, updatedAt: new Date().toISOString() });
-
   try {
-    const res = await fetch(`${url}/set/connectivity`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(value),
+    const redis = new Redis({
+      url: process.env.KV_REST_API_URL,
+      token: process.env.KV_REST_API_TOKEN,
     });
-    const result = await res.json();
-    return Response.json({ ok: true, status, upstash: result });
+
+    await redis.set('connectivity', { status, updatedAt: new Date().toISOString() });
+    return Response.json({ ok: true, status });
   } catch (e) {
     return Response.json({ error: e.message }, { status: 500 });
   }
