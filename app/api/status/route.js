@@ -1,8 +1,8 @@
 export const runtime = 'edge';
 
 async function kvGet(key) {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const url = process.env.KV_REST_API_URL;
+  const token = process.env.KV_REST_API_TOKEN;
   const res = await fetch(`${url}/get/${key}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
