@@ -1,5 +1,7 @@
 import { Redis } from '@upstash/redis';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const redis = new Redis({
