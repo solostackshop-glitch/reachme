@@ -16,8 +16,10 @@ export async function GET(request) {
   }
 
   try {
-    await kv.set('connectivity', { status, updatedAt: new Date().toISOString() });
-    return Response.json({ ok: true, status });
+    const payload = { status, updatedAt: new Date().toISOString() };
+    await kv.set('connectivity', payload);
+    const readback = await kv.get('connectivity');
+    return Response.json({ ok: true, status, wrote: payload, readback });
   } catch (e) {
     return Response.json({ error: e.message }, { status: 500 });
   }
